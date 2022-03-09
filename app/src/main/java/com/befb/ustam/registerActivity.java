@@ -40,7 +40,7 @@ public class registerActivity extends AppCompatActivity {
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     FirebaseFirestore firebaseFirestore;
-    String username,password,name;
+    String username,password,name,phoneNumber;
     boolean isUsta,isMusteri;
 
     @Override
@@ -53,7 +53,6 @@ public class registerActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
         firebaseFirestore = FirebaseFirestore.getInstance();
-
     }
 
     public void createUser(View view)
@@ -63,7 +62,7 @@ public class registerActivity extends AppCompatActivity {
         name = binding.nameEditText.getText().toString();
         isMusteri =  binding.musteriRadioButton.isChecked();
         isUsta = binding.ustaRadioButton.isChecked();
-
+        phoneNumber = binding.phoneEditText.getText().toString();
         mAuth.createUserWithEmailAndPassword(username,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
@@ -99,6 +98,7 @@ public class registerActivity extends AppCompatActivity {
             postData.put("UserType", "Usta");
         }
         postData.put("useremail",userEmail);
+        postData.put("PhoneNumber",phoneNumber);
         postData.put("Name",name);
         documentReference.set(postData).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override

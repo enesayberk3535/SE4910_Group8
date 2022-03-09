@@ -20,6 +20,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -54,6 +57,9 @@ public class UploadActivity extends AppCompatActivity {
     private ActivityUploadBinding binding;
     ActivityResultLauncher<Intent> activityResultLauncher;
     ActivityResultLauncher<String> permissionLauncher;
+    String[] items = {"Meterial", "Design", "Components", "Android"};
+    AutoCompleteTextView autoCompleteTextView;
+    ArrayAdapter<String> adapterItems;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +75,17 @@ public class UploadActivity extends AppCompatActivity {
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
 
+        //DROPBOX
+        autoCompleteTextView = binding.autoCompleteTxt;
+        adapterItems = new ArrayAdapter<>(this,R.layout.list_item,items);
+        autoCompleteTextView.setAdapter(adapterItems);
+        autoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String item = parent.getItemAtPosition(position).toString();
+                Toast.makeText(getApplicationContext(), "Item:" + item, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     public void upload(View view) {

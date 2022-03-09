@@ -32,7 +32,6 @@ public class LoginActivity extends AppCompatActivity {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
 
