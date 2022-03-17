@@ -1,20 +1,25 @@
-package com.befb.ustam;
+package com.befb.ustam.ui.home;
+
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.os.Debug;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.Toast;
-
-import com.google.firebase.Timestamp;
+import com.befb.ustam.MainActivity;
+import com.befb.ustam.MainRecyclerAdapter;
+import com.befb.ustam.Post;
+import com.befb.ustam.R;
+import com.befb.ustam.databinding.FragmentHomeBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -31,47 +36,23 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Map;
-import com.befb.ustam.databinding.ActivityMainBinding;
 
+public class HomeFragment extends Fragment {
 
-public class MainActivity extends AppCompatActivity {
-
+    private HomeViewModel homeViewModel;
+    private FragmentHomeBinding binding;
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firebaseFirestore;
     ArrayList<Post> postArrayList;
     MainRecyclerAdapter feedRecyclerAdapter;
-    private ActivityMainBinding binding;
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container, Bundle savedInstanceState) {
+        homeViewModel =
+                new ViewModelProvider(this).get(HomeViewModel.class);
 
-        MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.menu,menu);
-
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-
-        if (item.getItemId() == R.id.add_post) {
-            Intent intentToUpload = new Intent(MainActivity.this, UploadActivity.class);
-            startActivity(intentToUpload);
-        } else if (item.getItemId() == R.id.signout) {
-            firebaseAuth.signOut();
-            Intent intentToSignUp = new Intent(MainActivity.this, LoginActivity.class);
-            startActivity(intentToSignUp);
-            finish();
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
-        View view = binding.getRoot();
-        setContentView(view);
+        binding = FragmentHomeBinding.inflate(inflater, container, false);
+        View root = binding.getRoot();
 
         postArrayList = new ArrayList<Post>();
 
@@ -82,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         //RecyclerView
-        binding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        binding.recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         feedRecyclerAdapter = new MainRecyclerAdapter(postArrayList);
         binding.recyclerView.setAdapter(feedRecyclerAdapter);
 
@@ -105,8 +86,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        return root;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
 
     public void getDataFromFirestore() {
 
@@ -117,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
 
                 if (e != null) {
-                    Toast.makeText(MainActivity.this,e.getLocalizedMessage().toString(),Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(),e.getLocalizedMessage().toString(),Toast.LENGTH_LONG).show();
                 }
 
                 if (queryDocumentSnapshots != null) {
@@ -130,45 +117,9 @@ public class MainActivity extends AppCompatActivity {
                         String comment = (String) data.get("comment");
                         String userEmail = (String) data.get("useremail");
                         String dateString =  (String) data.get("postdate");
-
+                        String expertUUID = (String) data.get("expertUUID");
                         Post post = new Post(userEmail,comment,dateString);
-
-                        postArrayList.add(post);
-
-                    }
-                    feedRecyclerAdapter.notifyDataSetChanged();
-
-                }
-
-            }
-        });
-
-
-    }
-    public void getDataFromFirestore1() {
-
-        CollectionReference collectionReference = firebaseFirestore.collection("Users");
-
-        collectionReference.orderBy("date", Query.Direction.DESCENDING).addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-
-                if (e != null) {
-                    Toast.makeText(MainActivity.this,e.getLocalizedMessage().toString(),Toast.LENGTH_LONG).show();
-                }
-
-                if (queryDocumentSnapshots != null) {
-
-                    for (DocumentSnapshot snapshot : queryDocumentSnapshots.getDocuments()) {
-
-                        Map<String,Object> data = snapshot.getData();
-
-                        //Casting
-                        String comment = (String) data.get("comment");
-                        String userEmail = (String) data.get("useremail");
-                        String dateString =  (String) data.get("postdate");
-                        Post post = new Post(userEmail,comment,dateString);
-
+                        post.expertUUID =expertUUID;
                         postArrayList.add(post);
 
                     }

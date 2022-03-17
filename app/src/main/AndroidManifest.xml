@@ -10,6 +10,16 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Ustam">
         <activity
+            android:name=".ui.ProfilePage.ProfilePageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MainPageActivity"
+            android:exported="true"
+            android:label="@string/title_activity_main2" />
+        <activity
+            android:name=".ui.ProfilePage.ProfileActivity"
+            android:exported="false" />
+        <activity
             android:name=".UploadActivity"
             android:exported="true" />
         <activity

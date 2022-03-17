@@ -1,15 +1,19 @@
 package com.befb.ustam;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.befb.ustam.databinding.RecyclerRowBinding;
+import com.befb.ustam.ui.ProfilePage.DashboardFragment;
+import com.befb.ustam.ui.ProfilePage.ProfilePageActivity;
+import com.befb.ustam.ui.ProfilePage.ProfilePageFragment;
 
 import java.util.ArrayList;
 
@@ -44,7 +48,16 @@ public class MainRecyclerAdapter extends RecyclerView.Adapter<MainRecyclerAdapte
         holder.recyclerRowBinding.recyclerviewRowUseremailText.setText("E-mail: "+postArrayList.get(position).email);
         holder.recyclerRowBinding.recyclerviewRowCommentText.setText(postArrayList.get(position).comment);
         holder.recyclerRowBinding.dateTextView.setText(postArrayList.get(position).date);
-
+        holder.recyclerRowBinding.ConstraintLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AppCompatActivity activity = (AppCompatActivity) view.getContext();
+                Intent intent = new Intent(activity, ProfilePageActivity.class);
+                intent.putExtra("expertUUID", postArrayList.get(position).expertUUID);
+                System.out.println("ZORTRT:  "  +postArrayList.get(position).expertUUID);
+                activity.startActivity(intent);
+            }
+        });
         //Picasso.get().load(postArrayList.get(position).downloadUrl).into(holder.recyclerRowBinding.recyclerviewRowImageview);
     }
 

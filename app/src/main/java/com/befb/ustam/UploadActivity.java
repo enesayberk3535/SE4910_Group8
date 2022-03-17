@@ -13,18 +13,12 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.ImageDecoder;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.befb.ustam.databinding.ActivityUploadBinding;
@@ -37,14 +31,11 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 import com.google.android.material.snackbar.Snackbar;
 
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.UUID;
 
 public class UploadActivity extends AppCompatActivity {
 
@@ -57,7 +48,7 @@ public class UploadActivity extends AppCompatActivity {
     private ActivityUploadBinding binding;
     ActivityResultLauncher<Intent> activityResultLauncher;
     ActivityResultLauncher<String> permissionLauncher;
-    String[] items = {"Meterial", "Design", "Components", "Android"};
+    String[] items = {"Su tesisatı", "Elektrik", "Bilgisayar Tamiri", "Televizyon Tamiri"};
     AutoCompleteTextView autoCompleteTextView;
     ArrayAdapter<String> adapterItems;
 
@@ -98,13 +89,14 @@ public class UploadActivity extends AppCompatActivity {
                             postData.put("comment",comment);
                             postData.put("date", FieldValue.serverTimestamp());
                             postData.put("postdate", currentTime.toString());
-
+                            postData.put("expertUUID", firebaseUser.getUid());
                             firebaseFirestore.collection("Posts").add(postData).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                 @Override
                                 public void onSuccess(DocumentReference documentReference) {
-                                    Intent intent = new Intent(UploadActivity.this, MainActivity.class);
+                                    Intent intent = new Intent(getApplicationContext(), MainPageActivity.class);
                                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                     startActivity(intent);
+                                    finish();
                                 }
                             }).addOnFailureListener(new OnFailureListener() {
                                 @Override

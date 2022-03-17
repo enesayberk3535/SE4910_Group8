@@ -98,6 +98,7 @@ public class registerActivity extends AppCompatActivity {
             postData.put("UserType", "Usta");
         }
         postData.put("useremail",userEmail);
+        postData.put("AboutMe","Merhaba");
         postData.put("PhoneNumber",phoneNumber);
         postData.put("Name",name);
         documentReference.set(postData).addOnSuccessListener(new OnSuccessListener<Void>() {
