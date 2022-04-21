@@ -15,12 +15,14 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
 
+import com.befb.ustam.Model.CityList;
 import com.befb.ustam.databinding.ActivityUploadBinding;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -32,10 +34,17 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.gson.Gson;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 public class UploadActivity extends AppCompatActivity {
 
@@ -48,7 +57,7 @@ public class UploadActivity extends AppCompatActivity {
     private ActivityUploadBinding binding;
     ActivityResultLauncher<Intent> activityResultLauncher;
     ActivityResultLauncher<String> permissionLauncher;
-    String[] items = {"Su tesisatı", "Elektrik", "Bilgisayar Tamiri", "Televizyon Tamiri"};
+    String[] items = {"Su tesisati", "Elektrik", "Bilgisayar Tamiri", "Televizyon Tamiri", "Diger"};
     AutoCompleteTextView autoCompleteTextView;
     ArrayAdapter<String> adapterItems;
 
@@ -77,19 +86,56 @@ public class UploadActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Item:" + item, Toast.LENGTH_SHORT).show();
             }
         });
+
+        CityList cityList = new CityList();
+        try {
+            //Load File
+            BufferedReader jsonReader = new BufferedReader(new InputStreamReader(this.getResources().openRawResource(R.raw.citys)));
+            StringBuilder jsonBuilder = new StringBuilder();
+            for (String line = null; (line = jsonReader.readLine()) != null; ) {
+                jsonBuilder.append(line).append("\n");
+            }
+
+            Gson gson = new Gson();
+            cityList = gson.fromJson(jsonBuilder.toString(),CityList.class);
+
+            Log.d("Deneme",cityList.getCityDetail().get(0).getName());
+
+
+        } catch (FileNotFoundException e) {
+            Log.e("jsonFile", "file not found");
+        } catch (IOException e) {
+            Log.e("jsonFile", "ioerror");
+        }
+        List<String> spinnerData = new ArrayList<>();
+
+        for(int i=0;i<cityList.getCityDetail().size();i++){
+            spinnerData.add(cityList.getCityDetail().get(i).getName());
+        }
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, spinnerData);
+
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        binding.spinner.setAdapter(adapter);
+
     }
 
     public void upload(View view) {
                             Date currentTime = Calendar.getInstance().getTime();
                             FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
                             String userEmail = firebaseUser.getEmail();
+                            String workType = binding.autoCompleteTxt.getText().toString();
                             String comment = binding.commentText.getText().toString();
                             HashMap<String, Object> postData = new HashMap<>();
+                            postData.put("WorkType",workType);
                             postData.put("useremail",userEmail);
                             postData.put("comment",comment);
                             postData.put("date", FieldValue.serverTimestamp());
                             postData.put("postdate", currentTime.toString());
                             postData.put("expertUUID", firebaseUser.getUid());
+                            postData.put("City", binding.spinner.getSelectedItem().toString());
                             firebaseFirestore.collection("Posts").add(postData).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                 @Override
                                 public void onSuccess(DocumentReference documentReference) {

@@ -20,17 +20,6 @@
         app:layout_constraintTop_toBottomOf="@+id/textInputLayout3"
         tools:ignore="RtlCompat" />
 
-    <EditText
-        android:id="@+id/commentText2"
-        android:layout_width="211dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="16dp"
-        android:ems="10"
-        android:hint="Ücret"
-        android:inputType="textPersonName"
-        app:layout_constraintStart_toStartOf="@+id/commentText"
-        app:layout_constraintTop_toBottomOf="@+id/commentText" />
-
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textInputLayout3"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
@@ -53,13 +42,13 @@
         android:id="@+id/uploadButton"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:layout_marginTop="50dp"
+        android:layout_marginBottom="80dp"
         android:onClick="upload"
         android:text="İş ilanı gönder"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/commentText2" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/textView"
@@ -72,5 +61,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Spinner
+        android:id="@+id/spinner"
+        android:layout_width="391dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="1dp"
+        android:layout_marginEnd="1dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/commentText" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -46,8 +46,9 @@ public class MainRecyclerAdapter extends RecyclerView.Adapter<MainRecyclerAdapte
     @Override
     public void onBindViewHolder(@NonNull PostHolder holder, int position) {
         holder.recyclerRowBinding.recyclerviewRowUseremailText.setText("E-mail: "+postArrayList.get(position).email);
-        holder.recyclerRowBinding.recyclerviewRowCommentText.setText(postArrayList.get(position).comment);
+        holder.recyclerRowBinding.recyclerviewRowCommentText.setText("Açıklama: "+postArrayList.get(position).comment);
         holder.recyclerRowBinding.dateTextView.setText(postArrayList.get(position).date);
+        holder.recyclerRowBinding.cityTextView.setText("Şehir: " + postArrayList.get(position).city);
         holder.recyclerRowBinding.ConstraintLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

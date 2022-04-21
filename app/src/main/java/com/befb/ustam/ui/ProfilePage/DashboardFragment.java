@@ -24,6 +24,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.squareup.picasso.Picasso;
 
 public class DashboardFragment extends Fragment {
 
@@ -58,6 +59,7 @@ public class DashboardFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
         firebaseFirestore = FirebaseFirestore.getInstance();
+        getDownloadImageUrl();
         getDataFromFirestore();
     }
 
@@ -65,6 +67,25 @@ public class DashboardFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+    public void getDownloadImageUrl() {
+        CollectionReference collectionReference = firebaseFirestore.collection("Users");
+        DocumentReference documentReference = collectionReference.document(mUser.getUid());
+        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()){
+                    DocumentSnapshot document = task.getResult();
+                    if (document != null) {
+                        Picasso.get().load(document.getString("downloadurl")).into(binding.profileImageView1);
+                    } else {
+                        Log.d("LOGGER", "No such document");
+                    }
+                } else {
+                    Log.d("LOGGER", "get failed with ", task.getException());
+                }
+            }
+        });
     }
     public void getDataFromFirestore() {
         CollectionReference collectionReference = firebaseFirestore.collection("Users");

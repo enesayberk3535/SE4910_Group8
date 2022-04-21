@@ -118,7 +118,10 @@ public class HomeFragment extends Fragment {
                         String userEmail = (String) data.get("useremail");
                         String dateString =  (String) data.get("postdate");
                         String expertUUID = (String) data.get("expertUUID");
+                        String cityString =  (String) data.get("City");
                         Post post = new Post(userEmail,comment,dateString);
+                        post.city = cityString;
+
                         post.expertUUID =expertUUID;
                         postArrayList.add(post);
 
