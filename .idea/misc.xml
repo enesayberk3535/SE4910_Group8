@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/BERKAY/AndroidStudioProjects/Ustam/app/src/main/res/drawable/style_spinner.xml" value="0.31837606837606836" />
         <entry key="..\:/Users/BERKAY/AndroidStudioProjects/Ustam/app/src/main/res/layout/activity_login.xml" value="0.171875" />
         <entry key="..\:/Users/BERKAY/AndroidStudioProjects/Ustam/app/src/main/res/layout/activity_main.xml" value="0.21302083333333333" />
         <entry key="..\:/Users/BERKAY/AndroidStudioProjects/Ustam/app/src/main/res/layout/activity_main2.xml" value="0.371875" />
@@ -14,6 +15,7 @@
         <entry key="..\:/Users/BERKAY/AndroidStudioProjects/Ustam/app/src/main/res/layout/fragment_dashboard.xml" value="0.2296875" />
         <entry key="..\:/Users/BERKAY/AndroidStudioProjects/Ustam/app/src/main/res/layout/fragment_home.xml" value="0.2296875" />
         <entry key="..\:/Users/BERKAY/AndroidStudioProjects/Ustam/app/src/main/res/layout/fragment_notifications.xml" value="0.2388888888888889" />
+        <entry key="..\:/Users/BERKAY/AndroidStudioProjects/Ustam/app/src/main/res/layout/fragment_tabbed.xml" value="0.17264957264957265" />
         <entry key="..\:/Users/BERKAY/AndroidStudioProjects/Ustam/app/src/main/res/layout/list_item.xml" value="0.371875" />
         <entry key="..\:/Users/BERKAY/AndroidStudioProjects/Ustam/app/src/main/res/layout/recycler_comment_row.xml" value="0.67" />
         <entry key="..\:/Users/BERKAY/AndroidStudioProjects/Ustam/app/src/main/res/layout/recycler_row.xml" value="0.371875" />

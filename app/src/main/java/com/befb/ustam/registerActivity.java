@@ -63,17 +63,35 @@ public class registerActivity extends AppCompatActivity {
         isMusteri =  binding.musteriRadioButton.isChecked();
         isUsta = binding.ustaRadioButton.isChecked();
         phoneNumber = binding.phoneEditText.getText().toString();
-        mAuth.createUserWithEmailAndPassword(username,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if(task.isSuccessful()) {
-                    Toast.makeText(registerActivity.this,"register success",Toast.LENGTH_LONG).show();
-                    upload();
+        if(username!= null && password!= null && name!= null && phoneNumber != null && isMusteri == true){
+            mAuth.createUserWithEmailAndPassword(username,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    if(task.isSuccessful()) {
+                        Toast.makeText(registerActivity.this,"register success",Toast.LENGTH_LONG).show();
+                        upload();
+                    }
+                    else
+                        Toast.makeText(registerActivity.this,"register unsuccess",Toast.LENGTH_LONG).show();
                 }
-                else
-                    Toast.makeText(registerActivity.this,"register unsuccess",Toast.LENGTH_LONG).show();
-            }
-        });
+            });
+        }
+        else if (username!= null && password!= null && name!= null && phoneNumber != null && isUsta == true){
+            mAuth.createUserWithEmailAndPassword(username,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    if(task.isSuccessful()) {
+                        Toast.makeText(registerActivity.this,"register success",Toast.LENGTH_LONG).show();
+                        upload();
+                    }
+                    else
+                        Toast.makeText(registerActivity.this,"register unsuccess",Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+        else{
+            Toast.makeText(registerActivity.this,"Alanlar boş bırakılamaz.",Toast.LENGTH_LONG).show();
+        }
 
     }
     @Override

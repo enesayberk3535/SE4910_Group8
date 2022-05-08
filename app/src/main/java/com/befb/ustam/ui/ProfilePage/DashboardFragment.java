@@ -13,7 +13,10 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.befb.ustam.Comment;
+import com.befb.ustam.RecyclerCommentAdapter;
 import com.befb.ustam.databinding.FragmentDashboardBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -24,7 +27,12 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class DashboardFragment extends Fragment {
 
@@ -33,6 +41,8 @@ public class DashboardFragment extends Fragment {
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     FirebaseFirestore firebaseFirestore;
+    RecyclerCommentAdapter recyclerCommentAdapter;
+    ArrayList<Comment> commentsArrayList;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -59,8 +69,11 @@ public class DashboardFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
         firebaseFirestore = FirebaseFirestore.getInstance();
+        commentsArrayList = new ArrayList<>();
+        getDataFromFirestoreComments();
         getDownloadImageUrl();
         getDataFromFirestore();
+        getDataFromFirestoreStars();
     }
 
     @Override
@@ -68,6 +81,8 @@ public class DashboardFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
+
+
     public void getDownloadImageUrl() {
         CollectionReference collectionReference = firebaseFirestore.collection("Users");
         DocumentReference documentReference = collectionReference.document(mUser.getUid());
@@ -77,7 +92,7 @@ public class DashboardFragment extends Fragment {
                 if(task.isSuccessful()){
                     DocumentSnapshot document = task.getResult();
                     if (document != null) {
-                        Picasso.get().load(document.getString("downloadurl")).into(binding.profileImageView1);
+                        Picasso.get().load(document.getString("downloadurl")).into(binding.profileImageView);
                     } else {
                         Log.d("LOGGER", "No such document");
                     }
@@ -96,7 +111,9 @@ public class DashboardFragment extends Fragment {
                 if(task.isSuccessful()){
                     DocumentSnapshot document = task.getResult();
                     if (document != null) {
-                        binding.aboutMeTextView.setText(document.getString("AboutMe"));
+                        binding.expertInfoTextView.setText(document.getString("AboutMe"));
+                        binding.phoneTextView.setText("Telefon numarası: "+document.getString("PhoneNumber"));
+
                     } else {
                         Log.d("LOGGER", "No such document");
                     }
@@ -107,5 +124,70 @@ public class DashboardFragment extends Fragment {
         });
 
 
+    }
+    public void getDataFromFirestoreComments() {
+        CollectionReference collectionReference = firebaseFirestore.collection("Users");
+        collectionReference.document(mUser.getUid()).collection("comments").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    QuerySnapshot querySnapshot = task.getResult();
+                    if (querySnapshot != null) {
+                        List<DocumentSnapshot> allDocument = querySnapshot.getDocuments();
+                        for (DocumentSnapshot snapshot : allDocument) {
+                            String receivedName = snapshot.getString("Name");
+                            String receivedComment = snapshot.getString("comment");
+                            System.out.println(">Z " +receivedName + " " + receivedComment);
+                            Comment comment = new Comment(receivedName,receivedComment);
+                            commentsArrayList.add(comment);
+                        }
+                    }
+
+                    //RecyclerView
+                    binding.RecyclerViewComment.setLayoutManager(new LinearLayoutManager(getContext()));
+                    recyclerCommentAdapter = new RecyclerCommentAdapter(commentsArrayList);
+                    binding.RecyclerViewComment.setAdapter(recyclerCommentAdapter);
+
+                } else {
+                    Log.d("LOGGER", "No such Querysnapshot");
+                }
+            }
+        });
+    }
+    public void getDataFromFirestoreStars() {
+        CollectionReference collectionReference = firebaseFirestore.collection("Users");
+        collectionReference.document(mUser.getUid()).collection("rating").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    Float totalStars=0f;
+                    Integer quantityStars=0;
+                    QuerySnapshot querySnapshot = task.getResult();
+                    System.out.println(querySnapshot);
+                    if (querySnapshot != null) {
+                        List<DocumentSnapshot> allDocument = querySnapshot.getDocuments();
+                        quantityStars = allDocument.size();
+                        for (DocumentSnapshot snapshot : allDocument) {
+                            Map<String,Object> data = snapshot.getData();
+                            //Casting
+                            if (data.get("stars") != null){
+                                Number stars = (Number) data.get("stars");
+                                System.out.println("yildiz " + stars);
+                                totalStars+=Float.parseFloat(stars.toString());
+                            }
+                        }
+                        System.out.println(totalStars);
+                        System.out.println(quantityStars);
+                        Float avgStars = totalStars / quantityStars;
+                        binding.ratingBar.setRating(avgStars);
+                        System.out.println("avg " + avgStars);
+                    }
+
+
+                } else {
+                    Log.d("LOGGER", "No such Querysnapshot");
+                }
+            }
+        });
     }
 }
