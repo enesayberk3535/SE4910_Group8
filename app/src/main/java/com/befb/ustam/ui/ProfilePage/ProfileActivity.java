@@ -55,9 +55,14 @@ public class ProfileActivity extends AppCompatActivity {
     FirebaseFirestore firebaseFirestore;
     ActivityResultLauncher<Intent> activityResultLauncher;
     ActivityResultLauncher<String> permissionLauncher;
-    Bitmap selectedImage;
-    Uri imageData;
+    ActivityResultLauncher<String> permissionLauncher2;
+    ActivityResultLauncher<Intent> activityResultLauncher2;
 
+    Bitmap selectedImage;
+    Bitmap selectedImage2;
+
+    Uri imageData;
+    Uri imageData2;
     public ProfileActivity() {
     }
 
@@ -70,6 +75,8 @@ public class ProfileActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
         registerLauncher();
+        registerLauncher2();
+
         firebaseStorage = FirebaseStorage.getInstance();
         storageReference = firebaseStorage.getReference();
         firebaseFirestore = FirebaseFirestore.getInstance();
@@ -78,6 +85,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     public void upload(View view) {
         uploadPhoto();
+        uploadPhoto2();
         FirebaseUser firebaseUser = mAuth.getCurrentUser();
         String profileAboutMe = binding.commentText.getText().toString();
         DocumentReference documentReference = firebaseFirestore.collection("Users").document(mAuth.getUid());
@@ -113,6 +121,43 @@ public class ProfileActivity extends AppCompatActivity {
                             String downloadUrl = uri.toString();
                             HashMap<String, Object> postData = new HashMap<>();
                             postData.put("downloadurl",downloadUrl);
+                            firebaseFirestore.collection("Users").document(mAuth.getUid()).update(postData).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    Toast.makeText(getApplicationContext(), "Kaydedildi", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    });
+
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(ProfileActivity.this,e.getLocalizedMessage().toString(),Toast.LENGTH_LONG).show();
+                }
+            });
+
+        }
+
+    }
+
+    public void uploadPhoto2() {
+        if (imageData2 != null) {
+            //universal unique id
+            UUID uuid = UUID.randomUUID();
+            final String imageName = "protfolyoimages/" + uuid + ".jpg";
+            storageReference.child(imageName).putFile(imageData2).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    //Download URL
+                    StorageReference newReference = FirebaseStorage.getInstance().getReference(imageName);
+                    newReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            String downloadUrl = uri.toString();
+                            HashMap<String, Object> postData = new HashMap<>();
+                            postData.put("downloadurl2",downloadUrl);
                             firebaseFirestore.collection("Users").document(mAuth.getUid()).update(postData).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void unused) {
@@ -172,6 +217,24 @@ public class ProfileActivity extends AppCompatActivity {
             activityResultLauncher.launch(intentToGallery);
 
         }
+    }
+    public void selectImage2(View view) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if(ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                Snackbar.make(view,"Permission needed for gallery", Snackbar.LENGTH_INDEFINITE).setAction("Give Permission", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        permissionLauncher2.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
+                    }
+                }).show();
+            } else {
+                permissionLauncher2.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
+            }
+        } else {
+            Intent intentToGallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            activityResultLauncher2.launch(intentToGallery);
+
+        }
 
     }
 
@@ -224,5 +287,53 @@ public class ProfileActivity extends AppCompatActivity {
 
                 });
     }
+    public void registerLauncher2() {
+        activityResultLauncher2 = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult(ActivityResult result) {
+                        if (result.getResultCode() == Activity.RESULT_OK) {
+                            Intent intentFromResult = result.getData();
+                            if (intentFromResult != null) {
+                                imageData2 = intentFromResult.getData();
+                                try {
 
+                                    if (Build.VERSION.SDK_INT >= 28) {
+                                        ImageDecoder.Source source = ImageDecoder.createSource(ProfileActivity.this.getContentResolver(),imageData2);
+                                        selectedImage2 = ImageDecoder.decodeBitmap(source);
+                                        binding.imageViewIsEkle.setImageBitmap(selectedImage2);
+
+                                    } else {
+                                        selectedImage2 = MediaStore.Images.Media.getBitmap(ProfileActivity.this.getContentResolver(),imageData2);
+                                        binding.imageViewIsEkle.setImageBitmap(selectedImage2);
+                                    }
+
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                        }
+                    }
+                });
+
+
+        permissionLauncher =
+                registerForActivityResult(new ActivityResultContracts.RequestPermission(), new ActivityResultCallback<Boolean>() {
+                    @Override
+                    public void onActivityResult(Boolean result) {
+                        if(result) {
+                            //permission granted
+                            Intent intentToGallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                            activityResultLauncher.launch(intentToGallery);
+
+                        } else {
+                            //permission denied
+                            Toast.makeText(ProfileActivity.this,"Permisson needed!",Toast.LENGTH_LONG).show();
+                        }
+                    }
+
+                });
+    }
 }

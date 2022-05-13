@@ -52,6 +52,7 @@ public class ProfilePageActivity extends AppCompatActivity {
     TextView phoneTextView;
     String expertUUID;
     ImageView imageView;
+    ImageView imageViewCalisma;
     EditText commentEditText;
     RecyclerView recyclerViewComment;
     RecyclerCommentAdapter recyclerCommentAdapter;
@@ -70,11 +71,14 @@ public class ProfilePageActivity extends AppCompatActivity {
         recyclerViewComment = findViewById(R.id.RecyclerViewComment);
         ratingBar = findViewById(R.id.ratingBar);
         imageView = findViewById(R.id.profileImageView);
+        imageViewCalisma = findViewById(R.id.imageViewCalisma);
+
         commentsArrayList = new ArrayList<>();
         Intent intent = getIntent();
         expertUUID= intent.getStringExtra("expertUUID");
 
         getDownloadImageUrl();
+        getDownloadImageUrl2();
         getDataFromFirestore();
         getDataFromFirestoreComments();
         getDataFromFirestoreStars();
@@ -140,6 +144,28 @@ public class ProfilePageActivity extends AppCompatActivity {
                     DocumentSnapshot document = task.getResult();
                     if (document != null) {
                         Picasso.get().load(document.getString("downloadurl")).into(imageView);
+                    } else {
+                        Log.d("LOGGER", "No such document");
+                    }
+                } else {
+                    Log.d("LOGGER", "get failed with ", task.getException());
+                }
+            }
+        });
+    }
+    public void getDownloadImageUrl2() {
+
+        CollectionReference collectionReference = firebaseFirestore.collection("Users");
+        DocumentReference documentReference = collectionReference.document(expertUUID);
+        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()){
+
+                    DocumentSnapshot document = task.getResult();
+                    if (document != null) {
+
+                        Picasso.get().load(document.getString("downloadurl2")).into(imageViewCalisma);
                     } else {
                         Log.d("LOGGER", "No such document");
                     }

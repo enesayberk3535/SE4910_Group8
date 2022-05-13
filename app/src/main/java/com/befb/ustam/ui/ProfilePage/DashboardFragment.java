@@ -72,6 +72,8 @@ public class DashboardFragment extends Fragment {
         commentsArrayList = new ArrayList<>();
         getDataFromFirestoreComments();
         getDownloadImageUrl();
+        getDownloadImageUrl2();
+
         getDataFromFirestore();
         getDataFromFirestoreStars();
     }
@@ -93,6 +95,27 @@ public class DashboardFragment extends Fragment {
                     DocumentSnapshot document = task.getResult();
                     if (document != null) {
                         Picasso.get().load(document.getString("downloadurl")).into(binding.profileImageView);
+                    } else {
+                        Log.d("LOGGER", "No such document");
+                    }
+                } else {
+                    Log.d("LOGGER", "get failed with ", task.getException());
+                }
+            }
+        });
+    }
+
+    public void getDownloadImageUrl2() {
+        CollectionReference collectionReference = firebaseFirestore.collection("Users");
+        DocumentReference documentReference = collectionReference.document(mUser.getUid());
+        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()){
+
+                    DocumentSnapshot document = task.getResult();
+                    if (document != null) {
+                        Picasso.get().load(document.getString("downloadurl2")).into(binding.imageViewCalisma);
                     } else {
                         Log.d("LOGGER", "No such document");
                     }
