@@ -86,6 +86,7 @@ public class ProfileActivity extends AppCompatActivity {
     public void upload(View view) {
         uploadPhoto();
         uploadPhoto2();
+        uploadDesciptionWork();
         FirebaseUser firebaseUser = mAuth.getCurrentUser();
         String profileAboutMe = binding.commentText.getText().toString();
         DocumentReference documentReference = firebaseFirestore.collection("Users").document(mAuth.getUid());
@@ -105,6 +106,26 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
     }
+    public void uploadDesciptionWork() {
+        FirebaseUser firebaseUser = mAuth.getCurrentUser();
+        String descriptionWork = binding.desciptionText.getText().toString();
+        DocumentReference documentReference = firebaseFirestore.collection("Users").document(mAuth.getUid());
+        HashMap<String, Object> postData = new HashMap<>();
+        postData.put("DescriptionWork",descriptionWork);
+        documentReference.update(postData).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                System.out.println("onSuccessuploadDesciptionWork");
+            }
+        }) .addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(ProfileActivity.this,e.getLocalizedMessage().toString(),Toast.LENGTH_LONG).show();
+            }
+        });
+
+    }
+
     public void uploadPhoto() {
         if (imageData != null) {
             //universal unique id
@@ -176,7 +197,6 @@ public class ProfileActivity extends AppCompatActivity {
             });
 
         }
-
     }
 
 
@@ -190,6 +210,17 @@ public class ProfileActivity extends AppCompatActivity {
                     DocumentSnapshot document = task.getResult();
                     if (document != null) {
                         binding.commentText.setText(document.getString("AboutMe"));
+                        String type = document.getString("UserType");
+                        if(type.contains("Musteri")){
+                            binding.textView4.setVisibility(View.GONE);
+                            binding.imageViewIsEkle.setVisibility(View.GONE);
+                            binding.desciptionText.setVisibility(View.GONE);
+                        }
+                        else{
+                            binding.textView4.setVisibility(View.VISIBLE);
+                            binding.imageViewIsEkle.setVisibility(View.VISIBLE);
+                            binding.desciptionText.setVisibility(View.VISIBLE);
+                        }
                     } else {
                         Log.d("LOGGER", "No such document");
                     }

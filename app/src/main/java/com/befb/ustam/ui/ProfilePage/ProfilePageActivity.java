@@ -50,6 +50,8 @@ public class ProfilePageActivity extends AppCompatActivity {
     FirebaseFirestore firebaseFirestore;
     TextView informationTextView;
     TextView phoneTextView;
+    TextView descriptionTextView;
+    TextView isekleTextview;
     String expertUUID;
     ImageView imageView;
     ImageView imageViewCalisma;
@@ -66,13 +68,14 @@ public class ProfilePageActivity extends AppCompatActivity {
         mUser = mAuth.getCurrentUser();
         firebaseFirestore = FirebaseFirestore.getInstance();
         informationTextView = findViewById(R.id.expertInfoTextView);
+        descriptionTextView = findViewById(R.id.descriptonCalisma);
         phoneTextView = findViewById(R.id.phoneTextView);
         commentEditText = findViewById(R.id.commentEditText);
         recyclerViewComment = findViewById(R.id.RecyclerViewComment);
         ratingBar = findViewById(R.id.ratingBar);
         imageView = findViewById(R.id.profileImageView);
         imageViewCalisma = findViewById(R.id.imageViewCalisma);
-
+        isekleTextview =findViewById(R.id.textView8);
         commentsArrayList = new ArrayList<>();
         Intent intent = getIntent();
         expertUUID= intent.getStringExtra("expertUUID");
@@ -94,8 +97,19 @@ public class ProfilePageActivity extends AppCompatActivity {
                     DocumentSnapshot document = task.getResult();
                     if (document != null) {
                         informationTextView.setText(document.getString("AboutMe"));
+                        descriptionTextView.setText(document.getString("DescriptionWork"));
                         phoneTextView.setText("Telefon numarası: "+document.getString("PhoneNumber"));
-
+                        String type = document.getString("UserType");
+                        if(type.contains("Musteri")){
+                            isekleTextview.setVisibility(View.GONE);
+                            imageViewCalisma.setVisibility(View.GONE);
+                            descriptionTextView.setVisibility(View.GONE);
+                        }
+                        else{
+                            isekleTextview.setVisibility(View.VISIBLE);
+                            imageViewCalisma.setVisibility(View.VISIBLE);
+                            descriptionTextView.setVisibility(View.VISIBLE);
+                        }
                     } else {
                         Log.d("LOGGER", "No such document");
                     }
@@ -105,6 +119,7 @@ public class ProfilePageActivity extends AppCompatActivity {
             }
         });
     }
+
     public void getDataFromFirestoreComments() {
         CollectionReference collectionReference = firebaseFirestore.collection("Users");
         collectionReference.document(expertUUID).collection("comments").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -143,6 +158,7 @@ public class ProfilePageActivity extends AppCompatActivity {
                 if(task.isSuccessful()){
                     DocumentSnapshot document = task.getResult();
                     if (document != null) {
+                        if(document.getString("downloadurl") != null && document.getString("downloadurl") != "")
                         Picasso.get().load(document.getString("downloadurl")).into(imageView);
                     } else {
                         Log.d("LOGGER", "No such document");
@@ -164,7 +180,7 @@ public class ProfilePageActivity extends AppCompatActivity {
 
                     DocumentSnapshot document = task.getResult();
                     if (document != null) {
-
+                        if(document.getString("downloadurl2") != null && document.getString("downloadurl2") != "")
                         Picasso.get().load(document.getString("downloadurl2")).into(imageViewCalisma);
                     } else {
                         Log.d("LOGGER", "No such document");

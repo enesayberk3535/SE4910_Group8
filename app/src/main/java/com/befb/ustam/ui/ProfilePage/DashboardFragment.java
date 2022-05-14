@@ -73,7 +73,6 @@ public class DashboardFragment extends Fragment {
         getDataFromFirestoreComments();
         getDownloadImageUrl();
         getDownloadImageUrl2();
-
         getDataFromFirestore();
         getDataFromFirestoreStars();
     }
@@ -84,7 +83,6 @@ public class DashboardFragment extends Fragment {
         binding = null;
     }
 
-
     public void getDownloadImageUrl() {
         CollectionReference collectionReference = firebaseFirestore.collection("Users");
         DocumentReference documentReference = collectionReference.document(mUser.getUid());
@@ -93,8 +91,11 @@ public class DashboardFragment extends Fragment {
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if(task.isSuccessful()){
                     DocumentSnapshot document = task.getResult();
-                    if (document != null) {
-                        Picasso.get().load(document.getString("downloadurl")).into(binding.profileImageView);
+                    if (document != null ) {
+                        if(document.getString("downloadurl") != null && document.getString("downloadurl") != ""){
+                            Picasso.get().load(document.getString("downloadurl")).into(binding.profileImageView);
+                            System.out.println("bos mu" + document.getString("downloadurl"));
+                        }
                     } else {
                         Log.d("LOGGER", "No such document");
                     }
@@ -115,6 +116,7 @@ public class DashboardFragment extends Fragment {
 
                     DocumentSnapshot document = task.getResult();
                     if (document != null) {
+                        if(document.getString("downloadurl2") != null && document.getString("downloadurl2") != "")
                         Picasso.get().load(document.getString("downloadurl2")).into(binding.imageViewCalisma);
                     } else {
                         Log.d("LOGGER", "No such document");
@@ -135,8 +137,24 @@ public class DashboardFragment extends Fragment {
                     DocumentSnapshot document = task.getResult();
                     if (document != null) {
                         binding.expertInfoTextView.setText(document.getString("AboutMe"));
+                        binding.descriptonCalisma.setText(document.getString("DescriptionWork"));
                         binding.phoneTextView.setText("Telefon numarası: "+document.getString("PhoneNumber"));
+                        System.out.println("telefn: " + document.getString("PhoneNumber"));
+                        String type = document.getString("UserType");
+                        System.out.println("tip : "  + type);
 
+                        if(type.contains("Musteri")){
+                            System.out.println("tip girdi: "  + type);
+
+                            binding.textView8.setVisibility(View.GONE);
+                            binding.imageViewCalisma.setVisibility(View.GONE);
+                            binding.descriptonCalisma.setVisibility(View.GONE);
+                        }
+                        else{
+                            binding.textView8.setVisibility(View.VISIBLE);
+                            binding.imageViewCalisma.setVisibility(View.VISIBLE);
+                            binding.descriptonCalisma.setVisibility(View.VISIBLE);
+                        }
                     } else {
                         Log.d("LOGGER", "No such document");
                     }
@@ -156,7 +174,13 @@ public class DashboardFragment extends Fragment {
                 if (task.isSuccessful()) {
                     QuerySnapshot querySnapshot = task.getResult();
                     if (querySnapshot != null) {
+                        System.out.println("bull");
                         List<DocumentSnapshot> allDocument = querySnapshot.getDocuments();
+                        if (allDocument.size()==0){
+                            System.out.println("yorumyok");
+                            binding.RecyclerViewComment.setVisibility(View.GONE);
+                            binding.textView6.setVisibility(View.GONE);
+                        }
                         for (DocumentSnapshot snapshot : allDocument) {
                             String receivedName = snapshot.getString("Name");
                             String receivedComment = snapshot.getString("comment");
@@ -164,6 +188,9 @@ public class DashboardFragment extends Fragment {
                             Comment comment = new Comment(receivedName,receivedComment);
                             commentsArrayList.add(comment);
                         }
+                    }
+                    else{
+                        System.out.println("bosmus");
                     }
 
                     //RecyclerView
