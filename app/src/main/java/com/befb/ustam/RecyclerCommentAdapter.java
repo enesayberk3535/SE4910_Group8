@@ -46,7 +46,7 @@ public class RecyclerCommentAdapter extends RecyclerView.Adapter<RecyclerComment
 
     @Override
     public void onBindViewHolder(@NonNull PostHolder holder, int position) {
-        holder.recyclerCommentRowBinding.recyclerviewRowCommentText.setText(commentArrayList.get(position).name + " " + commentArrayList.get(position).comment);
+        holder.recyclerCommentRowBinding.recyclerviewRowCommentText.setText(commentArrayList.get(position).name + ": " + commentArrayList.get(position).comment);
     }
 
     @Override

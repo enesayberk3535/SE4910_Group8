@@ -53,6 +53,7 @@ public class ProfilePageActivity extends AppCompatActivity {
     TextView descriptionTextView;
     TextView isekleTextview;
     String expertUUID;
+    String userName;
     ImageView imageView;
     ImageView imageViewCalisma;
     EditText commentEditText;
@@ -79,10 +80,11 @@ public class ProfilePageActivity extends AppCompatActivity {
         commentsArrayList = new ArrayList<>();
         Intent intent = getIntent();
         expertUUID= intent.getStringExtra("expertUUID");
+        getDataFromFirestore();
+        getUserName();
 
         getDownloadImageUrl();
         getDownloadImageUrl2();
-        getDataFromFirestore();
         getDataFromFirestoreComments();
         getDataFromFirestoreStars();
     }
@@ -98,6 +100,7 @@ public class ProfilePageActivity extends AppCompatActivity {
                     if (document != null) {
                         informationTextView.setText(document.getString("AboutMe"));
                         descriptionTextView.setText(document.getString("DescriptionWork"));
+
                         phoneTextView.setText("Telefon numarası: "+document.getString("PhoneNumber"));
                         String type = document.getString("UserType");
                         if(type.contains("Musteri")){
@@ -233,13 +236,31 @@ public class ProfilePageActivity extends AppCompatActivity {
             }
         });
     }
+    private void getUserName(){
+        FirebaseUser firebaseUser = mAuth.getCurrentUser();
+        CollectionReference collectionReference = firebaseFirestore.collection("Users");
+        DocumentReference documentReference = collectionReference.document(firebaseUser.getUid());
+        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document != null) {
+                        userName = document.getString("Name");
+                        System.out.println("ne adi  "  + userName);
+                    }
+                }
+            }
+        });
+    }
+
     public void makeComment(View view)
     {
-        FirebaseUser firebaseUser = mAuth.getCurrentUser();
-        String userEmail = firebaseUser.getEmail();
+
         String comment = commentEditText.getText().toString();
+
         HashMap<String, Object> postData = new HashMap<>();
-        postData.put("Name",userEmail);
+        postData.put("Name",userName);
         postData.put("comment",comment);
 
         firebaseFirestore.collection("Users").document(expertUUID).collection("comments").add(postData).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
